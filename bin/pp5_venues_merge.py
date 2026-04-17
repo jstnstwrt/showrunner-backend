@@ -173,6 +173,10 @@ def main():
     logging.info("Loaded artrabbit venues: %s", len(dfrab))
 
     # --- Sequential source merges ---
+    for source_df in [df, dfss, dfag, dfay, dfrab]:
+        source_df['lat'] = pd.to_numeric(source_df['lat'], errors='coerce')
+        source_df['long'] = pd.to_numeric(source_df['long'], errors='coerce')
+
     logging.info("Merging seesaw venues, prior count: %s", len(df))
     df = make_update(df, dfss, 'seesaw_venue_id')
     logging.info("After seesaw merge: %s venues", len(df))
