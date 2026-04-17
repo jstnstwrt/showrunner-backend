@@ -122,7 +122,9 @@ def main():
 
     # --- Load prior merged venues and org table ---
     df = get_newest_file(s3, BUCKET, 'showrunner/merge/venues')
+    df['venue_id'] = pd.to_numeric(df['venue_id'], errors='coerce')
     dfo = get_newest_file(s3, BUCKET, 'showrunner/merge/org')
+    dfo['org_id'] = pd.to_numeric(dfo['org_id'], errors='coerce')
     # Preserve existing venue→org mappings before stripping org_id
     dfvo = df[['venue_id', 'org_id']].copy()
     del df['org_id']
@@ -135,6 +137,7 @@ def main():
     if 'Unnamed: 0' in dfss.columns:
         del dfss['Unnamed: 0']
     dfss = dfss.rename(columns={'venue_id': 'seesaw_venue_id'})
+    dfss['seesaw_venue_id'] = pd.to_numeric(dfss['seesaw_venue_id'], errors='coerce')
     dfss = dfss.dropna(subset=['venue_name'])
     dfss['museum'] = (
         dfss.venue_name.str.contains('museum', regex=False, case=False) &
@@ -150,6 +153,7 @@ def main():
     # --- Load and prepare artforum venues ---
     dfag = get_newest_file(s3, BUCKET, 'data_acquisition/artforum/preprocessed/sr_venues/artguide_venues')
     dfag = dfag.rename(columns={'venue_id': 'ag_venue_id'})
+    dfag['ag_venue_id'] = pd.to_numeric(dfag['ag_venue_id'], errors='coerce')
     dfag.venue_name = dfag.venue_name.str.split('|').str[0].str.strip()
     dfag['clean_name'] = dfag.venue_name.str.lower().str.replace('gallery', '', regex=False).str.strip()
     dfag['venue_type'] = 'Gallery'
@@ -158,6 +162,7 @@ def main():
     # --- Load and prepare artsy venues ---
     dfay = get_newest_file(s3, BUCKET, 'data_acquisition/artsy/preprocessed/sr_venues/artsy_venues')
     dfay = dfay.rename(columns={'venue_id': 'artsy_venue_id'})
+    dfay['artsy_venue_id'] = pd.to_numeric(dfay['artsy_venue_id'], errors='coerce')
     dfay.venue_name = dfay.venue_name.str.split('|').str[0].str.strip()
     dfay['clean_name'] = dfay.venue_name.str.lower().str.replace('gallery', '', regex=False).str.strip()
     dfay['venue_type'] = 'Gallery'
@@ -168,14 +173,22 @@ def main():
     # --- Load and prepare artrabbit venues ---
     dfrab = get_newest_file(s3, BUCKET, 'data_acquisition/artrabbit/preprocessed/sr_venues/artrabbit_venues')
     dfrab = dfrab.rename(columns={'venue_id': 'rabbit_venue_id'})
+    dfrab['rabbit_venue_id'] = pd.to_numeric(dfrab['rabbit_venue_id'], errors='coerce')
     dfrab = dfrab.dropna(subset=['rabbit_venue_id'])
     dfrab['clean_name'] = dfrab.venue_name.str.lower().str.replace('gallery', '', regex=False).str.strip()
     logging.info("Loaded artrabbit venues: %s", len(dfrab))
 
     # --- Sequential source merges ---
-    for source_df in [df, dfss, dfag, dfay, dfrab]:
-        source_df['lat'] = pd.to_numeric(source_df['lat'], errors='coerce')
-        source_df['long'] = pd.to_numeric(source_df['long'], errors='coerce')
+    df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
+    df['long'] = pd.to_numeric(df['long'], errors='coerce')
+    dfss['lat'] = pd.to_numeric(dfss['lat'], errors='coerce')
+    dfss['long'] = pd.to_numeric(dfss['long'], errors='coerce')
+    dfag['lat'] = pd.to_numeric(dfag['lat'], errors='coerce')
+    dfag['long'] = pd.to_numeric(dfag['long'], errors='coerce')
+    dfay['lat'] = pd.to_numeric(dfay['lat'], errors='coerce')
+    dfay['long'] = pd.to_numeric(dfay['long'], errors='coerce')
+    dfrab['lat'] = pd.to_numeric(dfrab['lat'], errors='coerce')
+    dfrab['long'] = pd.to_numeric(dfrab['long'], errors='coerce')
 
     logging.info("Merging seesaw venues, prior count: %s", len(df))
     df = make_update(df, dfss, 'seesaw_venue_id')
