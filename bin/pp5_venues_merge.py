@@ -45,6 +45,8 @@ def write_file(s3, df, bucket, prefix, name):
 
 
 def update_df(df, df2, col, flag=1):
+    df = df.drop_duplicates(subset=[col])
+    df2 = df2.drop_duplicates(subset=[col])
     df = df.set_index(col)
     df2 = df2.set_index(col)
     df.update(df2, overwrite=flag)
