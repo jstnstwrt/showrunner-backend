@@ -1,0 +1,12 @@
+pandas==1.2.4
+numpy==1.19.5
+boto3==1.13.14
+botocore==1.16.14
+s3transfer==0.3.7
+requests==2.25.1
+python-Levenshtein==0.12.2
+emoji==1.7.0
+unidecode==1.3.2
+pyOpenSSL==19.1.0
+cryptography==3.4.8
+bs4==0.0.1
